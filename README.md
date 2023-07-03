@@ -31,6 +31,9 @@ The federation is composed by a server and three clients (respectively called _A
 
 ## Contributors
 Bruno Casella <bruno.casella@unito.it>  
+
 Iacopo Colonnelli <iacopo.colonnelli@unito.it> 
+
 Gianluca Mittone <gianluca.mittone@unito.it> 
+	
 Marco Aldinucci <marco.aldinucci@unito.it>   
