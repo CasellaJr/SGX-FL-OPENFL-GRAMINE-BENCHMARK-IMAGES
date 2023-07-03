@@ -1,4 +1,4 @@
-# SGX-FL-OPENFL-GRAMINE-BENCHMARK-IMAGES
+# Federated Learning with Intel&reg Software Guard Extensions (SGX)
 
 This repository contains the necessary code to train an end-to-end safe and robust Federated Learning (FL) pipeline based on the [**Intel&reg; Software Guard Extensions (SGX)**](https://www.intel.com/content/www/us/en/architecture-and-technology/software-guard-extensions.html), the library OS [Gramine](https://gramineproject.io/), the [OpenFL](https://openfl.readthedocs.io/en/latest/index.html) framework for FL, and [PyTorch](https://pytorch.org/). The workflow trains a [ResNet-18](https://pytorch.org/vision/main/models/generated/torchvision.models.resnet18.html) over four image classification datasets:
 - [MNIST](http://yann.lecun.com/exdb/mnist/)
