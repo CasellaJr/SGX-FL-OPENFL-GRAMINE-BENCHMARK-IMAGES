@@ -11,8 +11,4 @@ For building a responsible and trustworthy FL infrastructure, the following poin
 - **Disk** is encrypted and transparently decrypted when accessed by Gramine or by any application running inside Gramine. Encrypted files guarantee data confidentiality and integrity (tamper resistance), as well as file swap protection (an encrypted file can only be accessed when in a specific host path).
 - **Communication** among participants of the federation is achieved by Transport Layer Security (TLS), allowing for trusted transmission of arbitrary data.
 
-The federation is composed by a server and three clients (respectively called _Aggregator_ and _Collaborators_ in OpenFL), running over four physical servers (Bare Metal) with the following characteristics:
-- Model name: Intel&reg; Xeon(R) Platinum 8380 CPU @ 2.30GHz (Ice-Lake based)
-- Thread(s) per core:  2
-- Core(s) per socket:  40
-- Socket(s):           2
+The federation is composed by a server and three clients (respectively called _Aggregator_ and _Collaborators_ in OpenFL), running over four different physical servers (Bare Metal) (Intel&reg; Xeon(R) Platinum 8380 CPU @ 2.30GHz (Ice-Lake based), 2 thread(s) per core, 40 cores per socket, 2 sockets)
