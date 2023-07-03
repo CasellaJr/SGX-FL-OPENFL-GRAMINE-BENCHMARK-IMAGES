@@ -1,4 +1,4 @@
-# Federated Learning with Intel&reg Software Guard Extensions (SGX)
+# Federated Learning with Intel&reg; Software Guard Extensions (SGX)
 
 This repository contains the necessary code to train an end-to-end safe and robust Federated Learning (FL) pipeline based on the [**Intel&reg; Software Guard Extensions (SGX)**](https://www.intel.com/content/www/us/en/architecture-and-technology/software-guard-extensions.html), the library OS [Gramine](https://gramineproject.io/), the [OpenFL](https://openfl.readthedocs.io/en/latest/index.html) framework for FL, and [PyTorch](https://pytorch.org/). The workflow trains a [ResNet-18](https://pytorch.org/vision/main/models/generated/torchvision.models.resnet18.html) over four image classification datasets:
 - [MNIST](http://yann.lecun.com/exdb/mnist/)
@@ -13,6 +13,12 @@ For building a responsible and trustworthy FL infrastructure, the following poin
 
 The federation is composed by a server and three clients (respectively called _Aggregator_ and _Collaborators_ in OpenFL), running over four different physical servers (Bare Metal) (Intel&reg; Xeon(R) Platinum 8380 CPU @ 2.30GHz (Ice-Lake based), 2 thread(s) per core, 40 cores per socket, 2 sockets).
 
+## Usage
+- First of all, [find if your processor supports Intel&reg; SGX](https://www.intel.com/content/www/us/en/support/articles/000028173/processors.html).
+- [Install OpenFL](https://openfl.readthedocs.io/en/latest/install.html).
+- Substitute the original `openfl/openfl-gramine/Dockerfile.gramine`, `openfl/openfl-gramine/Dockerfile.graminized.workspace` and `openfl/openfl-gramine/openfl.manifest.template` with the `Dockerfile.gramine`, `Dockerfile.graminized.workspace` and `openfl.manifest.template`provided in this repository, after having set the environment variables to the number of cores of your machine. This step is necessary to avoid an undesired and heavy slowdown due to the creation/destruction of too many threads, as widely discussed [in this GitHub issue](https://github.com/gramineproject/gramine/issues/1253). <!---Moreover, another source of slowdown has been identified in Gramine, which chooses a slow path in resolving the system calls. In a typical centralized Deep Learning scenario, this problem can be solved by compiling Gramine with patched libgomp. However, this solution seems not working in a federated setting. To run experiments with Gramine built with patched libgomp, please use Dockerfile.gramine.libgomp and Dockerfile.graminized.workspace.libgomp (rename and remove .libgomp)-->
+- Follow the [instructions](https://github.com/securefederatedai/openfl/blob/develop/openfl-gramine/MANUAL.md) to run OpenFL with Aggregator-based workflow inside SGX enclave with Gramine. To replicate our experiments, choose 3 as number of collaborators and `torch_cnn_mnist` as template. 
+
 ## Results
 |   | MNIST | CIFAR10 | CIFAR100 | SVHN |
 |---|-------|---------|----------|------|
@@ -22,3 +28,9 @@ The federation is composed by a server and three clients (respectively called _A
 | SGX + FS | 3h21m12s | 3h41m59s | 3h40m34s | 7h39m49s |
 | SGX + TLS| 3h42m54s | 3h53m52s | 3h59m55s | 8h10m53s |
 | SGX + FS + TLS| 3h51m4s | 4h7m35s | 4h11m1s | 8h6m30s |
+
+## Contributors
+Bruno Casella <bruno.casella@unito.it>  
+Iacopo Colonnelli <iacopo.colonnelli@unito.it>
+Gianluca Mittone <gianluca.mittone@unito.it>
+Marco Aldinucci <marco.aldinucci@unito.it>  
