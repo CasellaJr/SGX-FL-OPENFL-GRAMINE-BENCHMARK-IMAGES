@@ -14,8 +14,11 @@ For building a responsible and trustworthy FL infrastructure, the following poin
 The federation is composed by a server and three clients (respectively called _Aggregator_ and _Collaborators_ in OpenFL), running over four different physical servers (Bare Metal) (Intel&reg; Xeon(R) Platinum 8380 CPU @ 2.30GHz (Ice-Lake based), 2 thread(s) per core, 40 cores per socket, 2 sockets).
 
 ## Results
-|   | MNIST | CIFAR10 | CIFAR100 |
-|----------|---------------|--------------|----------|
-| BASELINE    | 60.000        | 10.000       | 10       |
-| BASELINE (GRAMINE)  | 50.000        | 10.000       | 10       |
-| SGX | 34.581        | 17.778       | 11       |
+|   | MNIST | CIFAR10 | CIFAR100 | SVHN |
+|---|-------|---------|----------|------|
+| BASELINE | 1h55m41s | 2h1m5s | 1h54m42s | 3h7m24s |
+| BASELINE (GRAMINE)  | 3h10m21s | 3h33m35s | 3h32m22s | 7h0m36s |
+| SGX | 3h17m52s | 3h36m56s | 3h49m29s | 6h51m10s |
+| SGX + FS | 3h21m12s | 3h41m59s | 3h40m34s | 7h39m49s |
+| SGX + TLS| 3h42m54s | 3h53m52s | 3h59m55s | 8h10m53s |
+| SGX + FS + TLS| 3h51m4s | 4h7m35s | 4h11m1s | 8h6m30s |
