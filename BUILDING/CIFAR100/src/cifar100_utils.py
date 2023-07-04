@@ -1,0 +1,127 @@
+# Copyright (C) 2020-2021 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+"""You may copy this file as the starting point of your own model."""
+
+from logging import getLogger
+
+import os
+os.environ["OMP_NUM_THREADS"] = "40" # export OMP_NUM_THREADS=40
+os.environ["OPENBLAS_NUM_THREADS"] = "40" # export OPENBLAS_NUM_THREADS=40
+os.environ["MKL_NUM_THREADS"] = "40" # export MKL_NUM_THREADS=40
+os.environ["VECLIB_MAXIMUM_THREADS"] = "40" # export VECLIB_MAXIMUM_THREADS=40
+os.environ["NUMEXPR_NUM_THREADS"] = "40" # export NUMEXPR_NUM_THREADS=40
+import numpy as np
+import torch
+from torch.utils.tensorboard import SummaryWriter
+from torchvision import datasets
+from torchvision import transforms
+
+logger = getLogger(__name__)
+
+writer = None
+
+
+def get_writer():
+    """Create global writer object."""
+    global writer
+    if not writer:
+        writer = SummaryWriter('./logs/cnn_cifar100', flush_secs=5)
+
+
+def write_metric(node_name, task_name, metric_name, metric, round_number):
+    """Write metric callback."""
+    get_writer()
+    writer.add_scalar(f'{node_name}/{task_name}/{metric_name}', metric, round_number)
+
+
+def one_hot(labels, classes):
+    """
+    One Hot encode a vector.
+
+    Args:
+        labels (list):  List of labels to onehot encode
+        classes (int): Total number of categorical classes
+
+    Returns:
+        np.array: Matrix of one-hot encoded labels
+    """
+    return np.eye(classes)[labels]
+
+
+def _load_raw_datashards(shard_num, collaborator_count, transform=None):
+    """
+    Load the raw data by shard.
+
+    Returns tuples of the dataset shard divided into training and validation.
+
+    Args:
+        shard_num (int): The shard number to use
+        collaborator_count (int): The number of collaborators in the federation
+        transform: torchvision.transforms.Transform to apply to images
+
+    Returns:
+        2 tuples: (image, label) of the training, validation dataset
+    """
+    train_data, val_data = (
+        datasets.CIFAR1000('data', train=train, download=True, transform=transform)
+        for train in (True, False)
+    )
+    X_train_tot, y_train_tot = train_data.data, train_data.targets
+    X_valid_tot, y_valid_tot = val_data.data, val_data.targets
+
+    # create the shards
+    shard_num = int(shard_num)
+    X_train = torch.from_numpy(X_train_tot[shard_num::collaborator_count])
+    X_train = X_train.permute(0,3,1,2)
+    X_train = X_train.float()
+    y_train = torch.Tensor(y_train_tot[shard_num::collaborator_count])
+    y_train = y_train.long()
+
+    X_valid = torch.from_numpy(X_valid_tot[shard_num::collaborator_count])
+    X_valid = X_valid.permute(0,3,1,2)
+    X_valid = X_valid.float()
+    y_valid = torch.Tensor(y_valid_tot[shard_num::collaborator_count])
+    y_valid = y_valid.long()
+    return (X_train, y_train), (X_valid, y_valid)
+
+
+def load_cifar100_shard(shard_num, collaborator_count,
+                     categorical=False, channels_last=True, **kwargs):
+    """
+    Load the CIFAR100 dataset.
+
+    Args:
+        shard_num (int): The shard to use from the dataset
+        collaborator_count (int): The number of collaborators in the
+                                  federation
+        categorical (bool): True = convert the labels to one-hot encoded
+                            vectors (Default = True)
+        channels_last (bool): True = The input images have the channels
+                              last (Default = True)
+        **kwargs: Additional parameters to pass to the function
+
+    Returns:
+        list: The input shape
+        int: The number of classes
+        numpy.ndarray: The training data
+        numpy.ndarray: The training labels
+        numpy.ndarray: The validation data
+        numpy.ndarray: The validation labels
+    """
+    num_classes = 10
+
+    (X_train, y_train), (X_valid, y_valid) = _load_raw_datashards(
+        shard_num, collaborator_count, transform=transforms.ToTensor())
+
+    logger.info(f'CIFAR100 > X_train Shape : {X_train.shape}')
+    logger.info(f'CIFAR100 > y_train Shape : {y_train.shape}')
+    logger.info(f'CIFAR100 > Train Samples : {X_train.shape[0]}')
+    logger.info(f'CIFAR100 > Valid Samples : {X_valid.shape[0]}')
+
+    if categorical:
+        # convert class vectors to binary class matrices
+        y_train = one_hot(y_train, num_classes)
+        y_valid = one_hot(y_valid, num_classes)
+
+    return num_classes, X_train, y_train, X_valid, y_valid

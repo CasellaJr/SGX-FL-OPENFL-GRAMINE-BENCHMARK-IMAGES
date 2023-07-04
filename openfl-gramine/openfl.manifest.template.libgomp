@@ -1,0 +1,104 @@
+loader.entrypoint = "file:{{ gramine.libos }}"
+#loader.entrypoint = "file:/usr/local/lib/x86_64-linux-gnu/gramine/libsysdb.so"
+libos.entrypoint = "/usr/bin/python3.10"
+loader.log_level = "trace"
+
+loader.env.LD_LIBRARY_PATH = "{{ python.stdlib }}/lib:/lib:{{ arch_libdir }}:/usr/lib:/usr/{{ arch_libdir }}"
+loader.env.no_proxy = "{{ no_proxy }}"
+loader.env.https_proxy = "{{ https_proxy }}"
+loader.env.http_proxy = "{{ http_proxy }}"
+loader.env.SSL_CERT_DIR = "/etc/ssl/certs"
+loader.env.OMP_NUM_THREADS = "40"
+loader.env.OPENBLAS_NUM_THREADS = "40"
+loader.env.MKL_NUM_THREADS = "40"
+loader.env.VECLIB_MAXIMUM_THREADS = "40"
+loader.env.NUMEXPR_NUM_THREADS = "40"
+loader.env.LD_PRELOAD = "/lib/libgomp.so.1"
+loader.env.PYTHONPATH = "/usr/local/lib/python3.10/dist-packages:/usr/lib/python3/dist-packages"
+#loader.env.PYTHONHOME = "/usr/local/lib/python3.10/dist-packages:/usr/lib/python3/dist-packages"
+
+loader.insecure__use_cmdline_argv = true
+
+sys.enable_sigterm_injection = true
+
+fs.start_dir="/workspace"
+
+
+# .URI - path on host
+# .PATH - pointer inside gramine
+
+fs.mounts = [
+  { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
+  { path = "{{ arch_libdir }}", uri = "file:{{ gramine.runtimedir() }}" },
+  { path = "/usr", uri = "file:/usr" },
+  { path = "/etc", uri = "file:/etc" },
+  { path = "/workspace", uri = "file:/workspace" },
+  { path = "/tmp", uri = "file:/tmp" },
+]
+#fs.mounts.lib.type = "chroot"
+#fs.mounts.lib.path = "/lib"
+#fs.mounts.lib.uri = "file:{{ gramine.runtimedir() }}"
+
+#fs.mounts.lib2.type = "chroot"
+#fs.mounts.lib2.path = "{{ arch_libdir }}"
+#fs.mounts.lib2.uri = "file:{{ arch_libdir }}"
+
+#fs.mounts.usr.type = "chroot"
+#fs.mounts.usr.path = "/usr"
+#fs.mounts.usr.uri = "file:/usr"
+
+#fs.mounts.etc.type = "chroot"
+#fs.mounts.etc.path = "/etc"
+#fs.mounts.etc.uri = "file:/etc"
+
+#fs.mounts.workspace.type = "chroot"
+#fs.mounts.workspace.path = "/workspace"
+#fs.mounts.workspace.uri = "file:/workspace"
+
+#fs.mounts.tmp.type = "tmpfs"
+#fs.mounts.tmp.path = "/tmp"
+#fs.mounts.tmp.uri = "file:/tmp"
+
+sgx.preheat_enclave = true
+
+# Detected a huge manifest, preallocating 64MB of internal memory.
+# error: Too small `loader.pal_internal_mem_size`, need at least 64MB because the manifest is large
+loader.pal_internal_mem_size = "256M"
+
+sgx.debug = false
+sgx.nonpie_binary = true
+sgx.enclave_size = "16G"
+sys.stack.size = "4M"
+sgx.max_threads = 512
+#sys.brk.max_size = "1M"
+
+sgx.isvprodid = {{ isvprodid }}
+sgx.isvsvn = {{ isvsvn }}
+
+sgx.trusted_files = [
+  "file:/usr/bin/python3.10",
+  "file:{{ gramine.runtimedir() }}/",
+  "file:{{ arch_libdir }}/",
+  "file:/usr/{{ arch_libdir }}/",
+  "file:/usr/local/lib/python3.10/",
+  "file:/usr/lib/x86_64-linux-gnu/libpython3.10.so.1.0",
+  "file:/usr/lib/python3/dist-packages/",
+  #"file:/workspace/src/",
+  #"file:/workspace/plan/plan.yaml",
+  "file:/usr/local/bin/fx",
+  "file:/usr/local/lib/x86_64-linux-gnu/gramine/libsysdb.so",
+  "file:/workspace/",
+  "file:/usr/lib/python3.10/",
+]
+
+sgx.allowed_files = [
+  "file:/tmp",
+  "file:/etc",
+  #"file:/workspace/save",
+  #"file:/workspace/logs",
+  #"file:/workspace/cert",
+  #"file:/workspace/data",
+  #"file:/workspace/plan/cols.yaml",
+  #"file:/workspace/plan/data.yaml",
+  "file:/workspace/",
+]

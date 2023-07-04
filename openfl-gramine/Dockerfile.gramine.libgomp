@@ -1,0 +1,82 @@
+FROM ubuntu:22.04
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
+
+RUN apt-get install -y build-essential \
+    autoconf bison gawk nasm ninja-build pkg-config python3 python3-click \
+    python3-jinja2 python3-pip python3-pyelftools wget git curl build-essential python-is-python3
+
+# Install OpenFL
+RUN pip install --upgrade pip && \
+    git clone --single-branch --branch develop https://github.com/intel/openfl.git && \
+    pip install ./openfl && \
+    pip install -U py-grpc-profile
+RUN rm /usr/local/lib/python3.10/dist-packages/openfl-gramine/openfl.manifest.template
+
+COPY openfl.manifest.template /usr/local/lib/python3.10/dist-packages/openfl-gramine/
+
+###### Compile gramine
+
+RUN python3 -m pip install 'meson>=0.56' 'tomli>=1.1.0' 'tomli-w>=0.4.0'
+RUN apt-get install -y libunwind8 musl-tools python3-pytest
+RUN apt-get install -y libgmp-dev libmpfr-dev libmpc-dev libisl-dev
+RUN apt-get install -y libprotobuf-c-dev protobuf-c-compiler \
+    protobuf-compiler python3-cryptography  python3-protobuf
+
+
+# ubuntu 22.04
+# Add sgx repo and download libraries for gramine
+RUN echo 'deb [signed-by=/etc/apt/keyrings/intel-sgx-keyring.asc arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu jammy main' | tee /etc/apt/sources.list.d/intel-sgx.list
+RUN wget https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
+RUN cat intel-sgx-deb.key | tee /etc/apt/keyrings/intel-sgx-keyring.asc > /dev/null
+
+RUN apt-get update
+RUN apt-get install -y libsgx-epid libsgx-quote-ex libsgx-dcap-ql
+RUN apt-get install -y libsgx-urts-dbgsym libsgx-enclave-common-dbgsym libsgx-dcap-ql-dbgsym libsgx-dcap-default-qpl-dbgsym
+RUN apt-get install -y libsgx-dcap-default-qpl
+
+
+#ubuntu 22.04
+RUN wget https://download.01.org/intel-sgx/latest/linux-latest/distro/ubuntu22.04-server/sgx_linux_x64_sdk_2.19.100.3.bin
+
+RUN chmod +x sgx_linux_x64_sdk_2.19.100.3.bin
+RUN echo 'yes' | ./sgx_linux_x64_sdk_2.19.100.3.bin
+RUN source sgxsdk/environment
+
+RUN apt-get install -y libsgx-enclave-common-dev libsgx-dcap-ql-dev libsgx-dcap-default-qpl-dev
+
+RUN curl -fsSL https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key | apt-key add -
+RUN apt-get update
+RUN apt-get install -y libsgx-dcap-quote-verify-dev
+
+
+# Compiule gramine
+RUN git clone https://github.com/gramineproject/gramine.git
+
+WORKDIR gramine
+#ubuntu22.04
+RUN meson setup build/ --buildtype=release -Ddirect=enabled -Dsgx=enabled -Dlibgomp=enabled -Dsgx_driver=upstream
+
+RUN ninja -C build/
+RUN ninja -C build/ install
+RUN gramine-sgx-gen-private-key
+
+WORKDIR /
+#originale
+RUN rm -rf /var/lib/apt/lists/*
+
+# graminelibos is under this dir
+ENV PYTHONPATH=/usr/local/lib/python3.10/dist-packages:/usr/lib/python3/dist-packages
+
+#set environment variables (threads)
+ENV OMP_NUM_THREADS=40
+ENV OPENBLAS_NUM_THREADS=40
+ENV MKL_NUM_THREADS=40
+ENV VECLIB_MAXIMUM_THREADS=40
+ENV NUMEXPR_NUM_THREADS=40
+
+# ENV LC_ALL=C.UTF-8
+# ENV LANG=C.UTF-8
