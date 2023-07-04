@@ -15,8 +15,9 @@ The federation is composed by a server and three clients (respectively called _A
 
 ## Usage
 - First of all, [find if your processor supports Intel&reg; SGX](https://www.intel.com/content/www/us/en/support/articles/000028173/processors.html).
+- Clone this repo. Modify the environment variables of the `Dockerfile.gramine` and `openfl.manifest.template`, setting them equal to the number of core(s) per socket of your machine.
 - [Install OpenFL](https://openfl.readthedocs.io/en/latest/install.html).
-- Substitute the original `openfl/openfl-gramine/Dockerfile.gramine`, `openfl/openfl-gramine/Dockerfile.graminized.workspace` and `openfl/openfl-gramine/openfl.manifest.template` with the `Dockerfile.gramine`, `Dockerfile.graminized.workspace` and `openfl.manifest.template`provided in this repository, after having set the environment variables to the number of core(s) per socket of your machine. This step is necessary to avoid an undesired and heavy slowdown due to the creation/destruction of too many threads, as widely discussed [in this GitHub issue](https://github.com/gramineproject/gramine/issues/1253). <!---Moreover, another source of slowdown has been identified in Gramine, which chooses a slow path in resolving the system calls. In a typical centralized Deep Learning scenario, this problem can be solved by compiling Gramine with patched libgomp. However, this solution seems not working in a federated setting. To run experiments with Gramine built with patched libgomp, please use Dockerfile.gramine.libgomp and Dockerfile.graminized.workspace.libgomp (rename and remove .libgomp)-->
+- Substitute the original `openfl/openfl-gramine/Dockerfile.gramine`, `openfl/openfl-gramine/Dockerfile.graminized.workspace` and `openfl/openfl-gramine/openfl.manifest.template` with the `Dockerfile.gramine`, `Dockerfile.graminized.workspace` and `openfl.manifest.template`provided in this repository. This step is necessary to avoid an undesired and heavy slowdown due to the creation/destruction of too many threads, as widely discussed [in this GitHub issue](https://github.com/gramineproject/gramine/issues/1253). <!---Moreover, another source of slowdown has been identified in Gramine, which chooses a slow path in resolving the system calls. In a typical centralized Deep Learning scenario, this problem can be solved by compiling Gramine with patched libgomp. However, this solution seems not working in a federated setting. To run experiments with Gramine built with patched libgomp, please use Dockerfile.gramine.libgomp and Dockerfile.graminized.workspace.libgomp (rename and remove .libgomp)-->
 - Follow the [instructions](https://github.com/securefederatedai/openfl/blob/develop/openfl-gramine/MANUAL.md) to run OpenFL with Aggregator-based workflow inside SGX enclave with Gramine. To replicate our experiments, choose 3 as number of collaborators and `torch_cnn_mnist` as template. Before proceeding with point 2, follow the next step of this guide in order to implement the right dataset, network and plan. 
 - In the building workspace, substitute `plan/plan.yaml`, `src/pt_cnn.py`, `src/NAME_OF_DATASET_utils.py` and `src/ptNAME_OF_DATASET_inmemory.py` with the same files provided in this repository. 
 - In `plan.yaml` you can enable/disable TLS and in `openfl.manifest.template` you can enable/disable disk encryption. 
@@ -37,5 +38,7 @@ Bruno Casella <bruno.casella@unito.it>
 Iacopo Colonnelli <iacopo.colonnelli@unito.it> 
 
 Gianluca Mittone <gianluca.mittone@unito.it> 
+
+Robert Renè Maria Birke <robert.birke@unito.it> 
 
 Marco Aldinucci <marco.aldinucci@unito.it>   
