@@ -1,4 +1,24 @@
-# Federated Learning with Intel&reg; Software Guard Extensions (SGX)
+# A Performance Analysis for Confidential Federated Learning
+
+[7th DEEP LEARNING SECURITY AND PRIVACY WORKSHOP](https://dlsp2024.ieee-security.org/) in conjunction with [IEEE Symposium on Security and Privacy](https://www.ieee-security.org/TC/SP2024/)
+
+> Federated Learning (FL) has emerged as a solution to preserve data privacy by keeping the data locally on each participant’s device. However, FL alone is still vulnerable to attacks that can cause privacy leaks. Therefore, additional security measures, at the cost of increasing runtimes, become necessary. The Trusted Execution Environment (TEE) approach offers the highest degree of security during execution. However, TEEs suffer from memory limits which prevent safe end-to-end FL training of modern deep models. State-of-the-art approaches limit secure training to selected layers, failing to avert the full spectrum of attacks or adopt layer-wise training affecting model performance. We benchmark the usage of a library OS (LibOS) to run the full, unmodified end-to-end FL training inside the TEE. We extensively evaluate and model the overhead of the different security mechanisms needed to protect the data and model during computation (TEE), communication (TLS), and storage (disk encryption). The obtained results across three datasets and two models demonstrate that LibOSes are a viable way to seamlessly inject security into FL with limited overhead (at most 2x), offering valuable guidance for researchers and developers aiming to apply FL in data-security-focused contexts.
+
+Please cite as:
+```
+@inproceedings{casella_etal_2024,
+  author  = {Casella, Bruno and Colonnelli, Iacopo and Mittone, Gianluca and Birke, Robert and Riviera, Walter and Sciarappa, Antonio and Cavazzoni, Carlo and Aldinucci, Marco},
+  title   = {A Performance Analysis for Confidential Federated Learning},
+  booktitle = {Proceedings of the 2024 Deep Learning Security and Privacy Workshop, IEEE Symposium on Security and Privacy 2024},
+	location = {San Francisco, CA},
+	month = may,
+	url = {XXX},
+	year = {2024},
+  volume  = {XX},
+  number  = {X},
+  pages   = {XXX--XXX}
+}
+```
 
 This repository contains the necessary code to train an end-to-end safe and robust Federated Learning (FL) pipeline based on the [**Intel&reg; Software Guard Extensions (SGX)**](https://www.intel.com/content/www/us/en/architecture-and-technology/software-guard-extensions.html), the library OS [Gramine](https://gramineproject.io/), the [OpenFL](https://openfl.readthedocs.io/en/latest/index.html) framework for FL, and [PyTorch](https://pytorch.org/). The workflow trains a [ResNet-18](https://pytorch.org/vision/main/models/generated/torchvision.models.resnet18.html) and [MobileNetV3-Small](https://pytorch.org/vision/main/models/generated/torchvision.models.mobilenet_v3_small.html) over three image classification datasets:
 - [MNIST](http://yann.lecun.com/exdb/mnist/)
