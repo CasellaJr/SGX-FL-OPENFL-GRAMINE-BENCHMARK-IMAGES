@@ -10,7 +10,7 @@ Please cite as:
   author  = {Casella, Bruno and Colonnelli, Iacopo and Mittone, Gianluca and Birke, Robert and Riviera, Walter and Sciarappa, Antonio and Cavazzoni, Carlo and Aldinucci, Marco},
   title   = {A Performance Analysis for Confidential Federated Learning},
   booktitle = {Proceedings of the 2024 Deep Learning Security and Privacy Workshop, IEEE Symposium on Security and Privacy 2024},
-  doi = {X}
+  doi = {X},
   location = {San Francisco, CA},
   month = may,
   url = {XXX},
